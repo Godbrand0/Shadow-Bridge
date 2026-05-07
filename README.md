@@ -121,12 +121,6 @@ npm install && npm run dev          # → http://localhost:3000
 
 ---
 
-## Team
-
-> Add team information here
-
----
-
 ## License
 
 MIT
