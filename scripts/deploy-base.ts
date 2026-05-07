@@ -24,7 +24,7 @@ import { ethers } from "hardhat";
 // ── Sepolia constants ──────────────────────────────────────────────────────────
 const RAW_USDC       = "0x9b5Cd13b8eFbB58Dc25A05CF411D8056058aDFfF";
 const CUSDC_TOKEN    = "0x7c5BF43B851c1dff1a4feE8dB225b87f2C223639";
-const MSG_TRANSMITTER = "0x7865fAfC2db2093669d92c0197e5d6f4Bf8175F3";
+const MSG_TRANSMITTER = "0x7865fAfC2db2093669d92c0F33AeEF291086BEFD";
 
 // Placeholder ETH bridge — update with setEthBridge() after ETH deploy
 const ETH_BRIDGE_PLACEHOLDER = ethers.ZeroAddress;
