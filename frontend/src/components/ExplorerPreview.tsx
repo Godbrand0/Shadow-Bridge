@@ -1,144 +1,108 @@
 "use client";
 
-// ████ = U+2588 FULL BLOCK — represents encrypted/opaque data
-const ENCRYPTED = "████████████";
+import { motion } from "framer-motion";
+
+const ENCRYPTED_BLOCK = "████████████";
 
 type Row = {
   hash: string;
   chain: string;
   chainColor: string;
-  fn: string;
-  inputs: { name: string; encrypted: boolean }[];
+  event: string;
+  hasAmount: boolean;
 };
 
 const ROWS: Row[] = [
-  {
-    hash: "0x3f2a…c901",
-    chain: "ETH",
-    chainColor: "#F97316",
-    fn: "depositConfidential()",
-    inputs: [
-      { name: "encryptedAmount", encrypted: true },
-      { name: "inputProof",      encrypted: true },
-    ],
-  },
-  {
-    hash: "0x7e1b…44d2",
-    chain: "Base",
-    chainColor: "#8B5CF6",
-    fn: "stake()",
-    inputs: [
-      { name: "encryptedAmount", encrypted: true },
-      { name: "inputProof",      encrypted: true },
-    ],
-  },
-  {
-    hash: "0x2d9f…b803",
-    chain: "Base",
-    chainColor: "#8B5CF6",
-    fn: "decryptBalance()",
-    inputs: [],
-  },
-  {
-    hash: "0x8c3a…2f71",
-    chain: "Base",
-    chainColor: "#8B5CF6",
-    fn: "onBalanceDecryptCallback()",
-    inputs: [
-      { name: "abiEncodedResult", encrypted: true },
-      { name: "decryptionProof",  encrypted: false },
-    ],
-  },
+  { hash: "0x3f2a…c901", chain: "ETH", chainColor: "var(--accent-eth)",  event: "depositConfidential()",      hasAmount: true  },
+  { hash: "0x7e1b…44d2", chain: "Base", chainColor: "var(--accent-base)", event: "stake()",                    hasAmount: true  },
+  { hash: "0x2d9f…b803", chain: "Base", chainColor: "var(--accent-base)", event: "decryptBalance()",            hasAmount: false },
+  { hash: "0x8c3a…2f71", chain: "Base", chainColor: "var(--accent-base)", event: "onBalanceDecryptCallback()",  hasAmount: true  },
 ];
 
 export function ExplorerPreview() {
   return (
-    <section className="mt-8">
+    <motion.section
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.4 }}
+    >
       {/* Header */}
-      <div className="mb-4 flex items-baseline gap-3">
-        <h3 className="text-[#9CA3AF] text-xs font-medium uppercase tracking-widest">
+      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem" }}>
+        <p style={{ fontSize: "0.6875rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-muted)", whiteSpace: "nowrap" }}>
           What observers see on-chain
-        </h3>
-        <div className="flex-1 h-[1px]" style={{ background: "rgba(255,255,255,0.06)" }} />
+        </p>
+        <div style={{ flex: 1, height: "1px", background: "var(--border-subtle)" }} />
       </div>
 
       {/* Table */}
-      <div
-        className="rounded-xl overflow-hidden"
-        style={{ border: "1px solid rgba(255,255,255,0.06)" }}
-      >
+      <div style={{ borderRadius: "var(--radius-md)", overflow: "hidden", border: "1px solid var(--border-subtle)" }}>
         {/* Column headers */}
         <div
-          className="grid grid-cols-[1fr_auto_1fr_1fr] gap-4 px-4 py-2 text-[10px] font-medium uppercase tracking-widest text-[#4B5563]"
-          style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", background: "rgba(255,255,255,0.02)" }}
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 2.5fr 1fr",
+            gap: "1rem",
+            padding: "0.5rem 1rem",
+            borderBottom: "1px solid var(--border-subtle)",
+            background: "var(--bg-elevated)",
+          }}
         >
-          <span>TX Hash</span>
-          <span>Chain</span>
-          <span>Function</span>
-          <span>Amount</span>
+          {["TX Hash", "Event", "Amount"].map((col) => (
+            <span key={col} style={{ fontSize: "0.625rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-muted)" }}>
+              {col}
+            </span>
+          ))}
         </div>
 
         {/* Rows */}
         {ROWS.map((row, i) => (
-          <div
+          <motion.div
             key={i}
-            className="grid grid-cols-[1fr_auto_1fr_1fr] gap-4 px-4 py-3 items-start text-xs"
+            whileHover={{ background: "var(--bg-overlay)" }}
+            transition={{ duration: 0.15 }}
             style={{
-              borderTop: i === 0 ? "none" : "1px solid rgba(255,255,255,0.04)",
-              background: i % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)",
+              display: "grid",
+              gridTemplateColumns: "1fr 2.5fr 1fr",
+              gap: "1rem",
+              padding: "0.625rem 1rem",
+              alignItems: "center",
+              background: i % 2 === 1 ? "var(--bg-elevated)" : "transparent",
+              borderTop: i === 0 ? "none" : "1px solid var(--border-subtle)",
+              cursor: "default",
             }}
           >
             {/* Hash */}
-            <span className="font-[family-name:var(--font-mono)] text-[#4B5563] text-[11px]">
+            <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>
               {row.hash}
             </span>
 
-            {/* Chain dot */}
-            <div className="flex items-center gap-1 pt-px">
+            {/* Event */}
+            <div style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
+              <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: row.chainColor, flexShrink: 0 }} />
+              <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--text-secondary)" }}>{row.event}</span>
+            </div>
+
+            {/* Amount */}
+            {row.hasAmount ? (
               <span
-                className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                style={{ background: row.chainColor }}
-              />
-              <span className="text-[#4B5563] text-[10px]">{row.chain}</span>
-            </div>
-
-            {/* Function name */}
-            <span className="font-[family-name:var(--font-mono)] text-[#9CA3AF] text-[11px] break-all">
-              {row.fn}
-            </span>
-
-            {/* Amount column */}
-            <div className="space-y-0.5">
-              {row.inputs.length === 0 ? (
-                <span className="text-[#374151] text-[11px]">—</span>
-              ) : (
-                row.inputs.map((inp, j) => (
-                  <div key={j} className="leading-none">
-                    {inp.encrypted ? (
-                      <span
-                        className="font-[family-name:var(--font-mono)] text-[11px] select-none"
-                        style={{ color: "#1F2937", letterSpacing: "-0.5px" }}
-                        title={`${inp.name}: encrypted — not visible to observers`}
-                      >
-                        {ENCRYPTED}
-                      </span>
-                    ) : (
-                      <span className="font-[family-name:var(--font-mono)] text-[#374151] text-[11px]">
-                        {inp.name}
-                      </span>
-                    )}
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
+                className="mono"
+                title="Encrypted — not visible to observers"
+                style={{ fontSize: "0.75rem", color: "var(--bg-overlay)", letterSpacing: "-0.5px", userSelect: "none" }}
+              >
+                {ENCRYPTED_BLOCK}
+              </span>
+            ) : (
+              <span style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>—</span>
+            )}
+          </motion.div>
         ))}
       </div>
 
       {/* Caption */}
-      <p className="mt-3 text-[#374151] text-xs text-center">
-        ████ = encrypted ciphertext. No amount is ever visible to external observers.
+      <p style={{ fontSize: "0.6875rem", color: "var(--text-muted)", textAlign: "center", marginTop: "0.75rem", fontStyle: "italic", lineHeight: 1.6 }}>
+        All amounts and identities remain encrypted.
+        Only event signatures are public.
       </p>
-    </section>
+    </motion.section>
   );
 }
