@@ -50,14 +50,12 @@ See [`docs/architecture.md`](docs/architecture.md) for the full two-contract flo
 
 ## Deployed Contracts
 
-> Fill in after deployment
-
-| Contract | Network | Address |
-|---|---|---|
-| ShadowBridgeBase | Sepolia | `0x` — TBD |
-| ShadowBridgeETH | Sepolia | `0x` — TBD |
-| Mock USDC (underlying) | Sepolia | `0x9b5Cd13b8eFbB58Dc25A05CF411D8056058aDFfF` |
-| Confidential cUSDC (ERC-7984) | Sepolia | `0x7c5BF43B851c1dff1a4feE8dB225b87f2C223639` |
+| Contract | Network | Address | Etherscan |
+|---|---|---|---|
+| ShadowBridgeBase | Sepolia | `0xC5Ab2eff958038aD58e541290781B5d9859d16c7` | [View ↗](https://sepolia.etherscan.io/address/0xC5Ab2eff958038aD58e541290781B5d9859d16c7#code) |
+| ShadowBridgeETH | Sepolia | `0x3BaeC7006BA6922c6B885D774B76557a66627B26` | [View ↗](https://sepolia.etherscan.io/address/0x3BaeC7006BA6922c6B885D774B76557a66627B26#code) |
+| Mock USDC (underlying) | Sepolia | `0x9b5Cd13b8eFbB58Dc25A05CF411D8056058aDFfF` | — |
+| Confidential cUSDC (ERC-7984) | Sepolia | `0x7c5BF43B851c1dff1a4feE8dB225b87f2C223639` | — |
 
 ---
 

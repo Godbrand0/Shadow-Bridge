@@ -65,12 +65,10 @@ ShadowBridge is the first bridge + staking protocol where:
 
 ## Deployed contract addresses
 
-> Fill in after deployment
-
 | Contract | Network | Address | Explorer |
 |---|---|---|---|
-| ShadowBridgeBase | Sepolia | `0x...` | [Etherscan]() |
-| ShadowBridgeETH | Sepolia | `0x...` | [Etherscan]() |
+| ShadowBridgeBase | Sepolia | `0xC5Ab2eff958038aD58e541290781B5d9859d16c7` | [Etherscan ↗](https://sepolia.etherscan.io/address/0xC5Ab2eff958038aD58e541290781B5d9859d16c7#code) |
+| ShadowBridgeETH | Sepolia | `0x3BaeC7006BA6922c6B885D774B76557a66627B26` | [Etherscan ↗](https://sepolia.etherscan.io/address/0x3BaeC7006BA6922c6B885D774B76557a66627B26#code) |
 
 ---
 
