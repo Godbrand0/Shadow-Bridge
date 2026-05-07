@@ -1,0 +1,46 @@
+# ── FHEVM ────────────────────────────────────────────────────────────────────
+fhevmTemp
+
+# ── Build outputs ─────────────────────────────────────────────────────────────
+.coverage_artifacts
+.coverage_cache
+.coverage_contracts
+artifacts
+build
+cache
+coverage
+dist
+node_modules
+types
+deployments
+tmp
+
+# ── Environment ───────────────────────────────────────────────────────────────
+*.env
+.env
+.env.local
+.env.*.local
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Package manager ───────────────────────────────────────────────────────────
+.pnp.*
+coverage.json
+pnpm-lock.yaml
+yarn.lock
+
+# ── Frontend (Next.js) ────────────────────────────────────────────────────────
+frontend/.next/
+frontend/node_modules/
+frontend/out/
+frontend/.env.local
+frontend/.env.*.local
+
+# ── Claude AI memory (local only) ────────────────────────────────────────────
+.claude/
