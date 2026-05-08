@@ -2,19 +2,25 @@
 pragma solidity ^0.8.24;
 
 /// @title ICCTPTokenMessenger
-/// @notice Minimal Circle CCTP TokenMessenger interface for burn/mint cross-chain flow.
+/// @notice Circle CCTP V2 TokenMessenger interface for burn/mint cross-chain flow.
 interface ICCTPTokenMessenger {
     /// @notice Burns tokens on the source chain and emits a message for minting on the destination.
-    /// @param amount        Amount of tokens to burn (in token's native decimals).
-    /// @param destinationDomain  Circle domain ID of the destination chain (e.g. Base Sepolia = 6).
-    /// @param mintRecipient  Address on the destination chain that will receive minted tokens (padded to bytes32).
-    /// @param burnToken     Address of the token contract to burn on the source chain (e.g. USDC).
-    /// @return nonce        Unique nonce assigned to this burn message.
+    /// @param amount                Amount of tokens to burn (in token's native decimals). Fee is deducted from this.
+    /// @param destinationDomain     Circle domain ID of the destination chain (e.g. Base Sepolia = 6).
+    /// @param mintRecipient         Address on the destination chain that will receive minted tokens (padded to bytes32).
+    /// @param burnToken             Address of the token contract to burn on the source chain (e.g. USDC).
+    /// @param destinationCaller     If non-zero, only this address may call receiveMessage on the destination. Use bytes32(0) for no restriction.
+    /// @param maxFee                Maximum fee (in burnToken decimals) Circle may deduct from amount. Recipient gets amount - actualFee.
+    /// @param minFinalityThreshold  Minimum finality threshold for attestation. 1000 = Fast Transfer (~8s). 0 = Standard (~15-40min).
+    /// @return nonce                Unique nonce assigned to this burn message.
     function depositForBurn(
         uint256 amount,
         uint32 destinationDomain,
         bytes32 mintRecipient,
-        address burnToken
+        address burnToken,
+        bytes32 destinationCaller,
+        uint256 maxFee,
+        uint32 minFinalityThreshold
     ) external returns (uint64 nonce);
 
     /// @notice Mints tokens on the destination chain by consuming a valid attested burn message.

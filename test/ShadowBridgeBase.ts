@@ -38,7 +38,7 @@ async function deployFixture(rewardRate = 0n) {
 
   const bridge = (await (
     await ethers.getContractFactory("ShadowBridgeBase")
-  ).deploy(usdcAddress, cctpAddress, ethBridgePlaceholder, rewardRate)) as ShadowBridgeBase;
+  ).deploy(usdcAddress, cctpAddress, cctpAddress, ethBridgePlaceholder, rewardRate)) as ShadowBridgeBase;
   const bridgeAddress = await bridge.getAddress();
 
   return {
@@ -127,7 +127,7 @@ describe("ShadowBridgeBase", function () {
           cctpMsg,
           "0x",
         ),
-      ).to.be.revertedWith("ShadowBridgeBase: untrusted source");
+      ).to.be.revertedWith("ShadowBridgeDest: untrusted source");
     });
   });
 
@@ -208,7 +208,7 @@ describe("ShadowBridgeBase", function () {
         .encrypt();
       await expect(
         bridge.connect(signers.alice).stake(input2.handles[0], input2.inputProof),
-      ).to.be.revertedWith("ShadowBridgeBase: decrypt pending");
+      ).to.be.revertedWith("ShadowBridgeDest: decrypt pending");
     });
   });
 
@@ -537,24 +537,20 @@ describe("ShadowBridgeBase", function () {
       await (await bridge.connect(signers.alice).decryptBalance()).wait();
 
       await expect(bridge.connect(signers.alice).decryptBalance()).to.be.revertedWith(
-        "ShadowBridgeBase: decrypt already pending",
+        "ShadowBridgeDest: decrypt already pending",
       );
     });
   });
 
   // ---------------------------------------------------------------------------
-  // onUnstakeCallback
+  // bridgeOut
   // ---------------------------------------------------------------------------
 
-  describe("onUnstakeCallback", function () {
-    it("full unstake callback flow transfers USDC to user", async function () {
+  describe("bridgeOut", function () {
+    it("emits BridgeOutRequested, sets hasPendingBridge, reduces stake", async function () {
       if (!fhevm.isMock) this.skip();
-      const { bridge, bridgeAddress, mockUSDC } = await deployFixture();
+      const { bridge, bridgeAddress } = await deployFixture();
 
-      // Fund bridge with USDC
-      await mockUSDC.mint(await bridge.getAddress(), STAKE_AMOUNT);
-
-      // Stake
       const stakeInput = await fhevm
         .createEncryptedInput(bridgeAddress, signers.alice.address)
         .add64(STAKE_AMOUNT)
@@ -563,41 +559,112 @@ describe("ShadowBridgeBase", function () {
         await bridge.connect(signers.alice).stake(stakeInput.handles[0], stakeInput.inputProof)
       ).wait();
 
-      // Unstake 50 — this marks actualUnstake handle publicly decryptable
-      const unstakeInput = await fhevm
+      const bridgeInput = await fhevm
         .createEncryptedInput(bridgeAddress, signers.alice.address)
         .add64(HALF_STAKE)
         .encrypt();
-      await (
-        await bridge.connect(signers.alice).unstake(unstakeInput.handles[0], unstakeInput.inputProof)
-      ).wait();
+      const destDomain = 3; // Arbitrum
+      const recipient = ethers.zeroPadValue(signers.alice.address, 32);
 
-      // The unstake handle is the actualUnstake computed value, not the input.
-      // We can recover it: after unstake, stake went from 100→50.
-      // The actual unstake handle is held in _handleOwner — we find it by searching
-      // for a handle owned by alice that isn't the current stake/reward handle.
-      // In tests, we use publicDecryptEuint on the remaining stake to verify,
-      // and trigger the callback by using the remaining stake handle approach.
+      const tx = await bridge
+        .connect(signers.alice)
+        .bridgeOut(bridgeInput.handles[0], bridgeInput.inputProof, destDomain, recipient);
 
-      // Simpler: we know the contract minted the actualUnstake handle.
-      // Use the unstake amount as a reference and check USDC balance after callback.
-      // To call onUnstakeCallback, we need the exact handle. We use a hack:
-      // call fhevm.publicDecrypt on ALL publicly decryptable handles.
-      // Actually, we stored the handle in _handleOwner. Let's read the stake change instead.
+      await expect(tx).to.emit(bridge, "BridgeOutRequested").withArgs(signers.alice.address, destDomain);
+      expect(await bridge.hasPendingBridge(signers.alice.address)).to.be.true;
 
-      // Verify via remaining stake decrypt
+      // Verify stake was reduced
       const stakeHandle = await bridge.getStakeHandle(signers.alice.address);
-      const remaining = await fhevm.userDecryptEuint(
+      const remainingStake = await fhevm.userDecryptEuint(
         FhevmType.euint64,
         stakeHandle,
         bridgeAddress,
         signers.alice,
       );
-      expect(remaining).to.eq(HALF_STAKE); // 100 - 50 = 50 ✓
+      expect(remainingStake).to.eq(HALF_STAKE);
+    });
 
-      // For the full callback test, we'd need to recover the actualUnstake handle.
-      // In production, the relayer tracks this from FHEVM coprocessor events.
-      // Here we trust the stake reduction as proof the FHE.select path executed correctly.
+    it("reverts if bridgeOut is called while another bridge is pending", async function () {
+      if (!fhevm.isMock) this.skip();
+      const { bridge, bridgeAddress } = await deployFixture();
+
+      const stakeInput = await fhevm
+        .createEncryptedInput(bridgeAddress, signers.alice.address)
+        .add64(STAKE_AMOUNT)
+        .encrypt();
+      await (
+        await bridge.connect(signers.alice).stake(stakeInput.handles[0], stakeInput.inputProof)
+      ).wait();
+
+      const bridgeInput = await fhevm
+        .createEncryptedInput(bridgeAddress, signers.alice.address)
+        .add64(HALF_STAKE)
+        .encrypt();
+      const destDomain = 3;
+      const recipient = ethers.zeroPadValue(signers.alice.address, 32);
+
+      await (
+        await bridge
+          .connect(signers.alice)
+          .bridgeOut(bridgeInput.handles[0], bridgeInput.inputProof, destDomain, recipient)
+      ).wait();
+
+      await expect(
+        bridge
+          .connect(signers.alice)
+          .bridgeOut(bridgeInput.handles[0], bridgeInput.inputProof, destDomain, recipient),
+      ).to.be.revertedWith("ShadowBridgeDest: bridge pending");
+    });
+
+    it("reverts if bridgeOut recipient is zero", async function () {
+      if (!fhevm.isMock) this.skip();
+      const { bridge, bridgeAddress } = await deployFixture();
+
+      const stakeInput = await fhevm
+        .createEncryptedInput(bridgeAddress, signers.alice.address)
+        .add64(STAKE_AMOUNT)
+        .encrypt();
+      await (
+        await bridge.connect(signers.alice).stake(stakeInput.handles[0], stakeInput.inputProof)
+      ).wait();
+
+      const bridgeInput = await fhevm
+        .createEncryptedInput(bridgeAddress, signers.alice.address)
+        .add64(HALF_STAKE)
+        .encrypt();
+
+      await expect(
+        bridge
+          .connect(signers.alice)
+          .bridgeOut(bridgeInput.handles[0], bridgeInput.inputProof, 3, ethers.ZeroHash),
+      ).to.be.revertedWith("ShadowBridgeDest: zero recipient");
+    });
+
+    it("reverts unstake if bridge pending", async function () {
+      if (!fhevm.isMock) this.skip();
+      const { bridge, bridgeAddress } = await deployFixture();
+
+      const stakeInput = await fhevm
+        .createEncryptedInput(bridgeAddress, signers.alice.address)
+        .add64(STAKE_AMOUNT)
+        .encrypt();
+      await (
+        await bridge.connect(signers.alice).stake(stakeInput.handles[0], stakeInput.inputProof)
+      ).wait();
+
+      const bridgeInput = await fhevm
+        .createEncryptedInput(bridgeAddress, signers.alice.address)
+        .add64(HALF_STAKE)
+        .encrypt();
+      await (
+        await bridge
+          .connect(signers.alice)
+          .bridgeOut(bridgeInput.handles[0], bridgeInput.inputProof, 3, ethers.zeroPadValue(signers.alice.address, 32))
+      ).wait();
+
+      await expect(
+        bridge.connect(signers.alice).unstake(bridgeInput.handles[0], bridgeInput.inputProof),
+      ).to.be.revertedWith("ShadowBridgeDest: bridge pending");
     });
   });
 });
