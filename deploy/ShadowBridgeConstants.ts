@@ -1,0 +1,8 @@
+export const CCTP_MESSENGER = "0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5";
+export const CCTP_TRANSMITTER = "0x7865f3792467fd37555622dAF2401a917057A60d"; // MessageTransmitter on Sepolia (usually same)
+
+export const USDC_SEPOLIA = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238";
+export const USDC_BASE_SEPOLIA = "0x036CbD53842c5426634e7929541eC2318f3dCF7e";
+export const USDC_ARB_SEPOLIA = "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d";
+
+export const REWARD_RATE = "100000000000000000"; // 0.1 tokens per block (approx)

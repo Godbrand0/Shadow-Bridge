@@ -57,6 +57,24 @@ const config: HardhatUserConfig = {
       chainId: 11155111,
       url: `https://sepolia.infura.io/v3/${INFURA_API_KEY}`,
     },
+    baseSepolia: {
+      accounts: {
+        mnemonic: MNEMONIC,
+        path: "m/44'/60'/0'/0/",
+        count: 10,
+      },
+      chainId: 84532,
+      url: "https://sepolia.base.org",
+    },
+    arbitrumSepolia: {
+      accounts: {
+        mnemonic: MNEMONIC,
+        path: "m/44'/60'/0'/0/",
+        count: 10,
+      },
+      chainId: 421614,
+      url: "https://sepolia-rollup.arbitrum.io/rpc",
+    },
   },
   paths: {
     artifacts: "./artifacts",

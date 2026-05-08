@@ -13,19 +13,19 @@ import { ethers } from "hardhat";
 async function main() {
   const [deployer] = await ethers.getSigners();
 
-  const baseAddress = process.env.BASE_BRIDGE_ADDRESS;
+  const bridgeAddress = process.env.BRIDGE_ADDRESS;
   const ethAddress  = process.env.ETH_BRIDGE_ADDRESS;
 
-  if (!baseAddress || !ethAddress) {
-    throw new Error("Both BASE_BRIDGE_ADDRESS and ETH_BRIDGE_ADDRESS must be set.");
+  if (!bridgeAddress || !ethAddress) {
+    throw new Error("Both BRIDGE_ADDRESS and ETH_BRIDGE_ADDRESS must be set.");
   }
 
-  const baseBridge = await ethers.getContractAt("ShadowBridgeBase", baseAddress, deployer);
-  const tx = await (baseBridge as any).setEthBridge(ethAddress);
+  // ShadowBridgeDest has the setEthBridge function
+  const bridge = await ethers.getContractAt("ShadowBridgeDest", bridgeAddress, deployer);
+  const tx = await (bridge as any).setEthBridge(ethAddress);
   const receipt = await tx.wait();
 
-  console.log("✓ setEthBridge() called");
-  console.log("  ShadowBridgeBase:  ", baseAddress);
+  console.log(`✓ setEthBridge() called on ${bridgeAddress}`);
   console.log("  ethShadowBridge → ", ethAddress);
   console.log("  tx:", receipt.hash);
   console.log("\nDeployment complete. Both contracts are wired.");

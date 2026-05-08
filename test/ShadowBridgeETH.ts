@@ -60,6 +60,64 @@ describe("ShadowBridgeETH", function () {
     expect(await bridge.usdcToken()).to.eq(await mockUSDC.getAddress());
     expect(await bridge.cctpMessenger()).to.eq(await mockCCTP.getAddress());
     expect(await bridge.BASE_DOMAIN()).to.eq(6);
+    expect(await bridge.ARBITRUM_DOMAIN()).to.eq(3);
+  });
+
+  it("pre-registers Base destination and allows owner to register Arbitrum", async function () {
+    const baseBridge = await bridge.destinations(6);
+    expect(baseBridge).to.not.eq(ethers.ZeroHash);
+
+    // Register a mock Arbitrum destination
+    const arbBridge = signers.bob.address;
+    await bridge.connect(signers.deployer).registerDestination(3, arbBridge);
+    const stored = await bridge.destinations(3);
+    expect(stored).to.eq(ethers.zeroPadValue(arbBridge, 32));
+  });
+
+  it("reverts depositConfidential for an unregistered destination", async function () {
+    const input = await fhevm
+      .createEncryptedInput(bridgeAddress, signers.alice.address)
+      .add64(CLEAR_AMOUNT)
+      .encrypt();
+
+    await mockUSDC.mint(signers.alice.address, CLEAR_AMOUNT);
+    await mockUSDC.connect(signers.alice).approve(bridgeAddress, CLEAR_AMOUNT);
+
+    await expect(
+      bridge.connect(signers.alice).depositConfidential(input.handles[0], input.inputProof, 3),
+    ).to.be.revertedWith("ShadowBridgeETH: unknown destination");
+  });
+
+  it("bridges to Arbitrum when destination domain 3 is registered", async function () {
+    // Register mock Arbitrum destination
+    const arbBridgePlaceholder = signers.bob.address;
+    await bridge.connect(signers.deployer).registerDestination(3, arbBridgePlaceholder);
+
+    const input = await fhevm
+      .createEncryptedInput(bridgeAddress, signers.alice.address)
+      .add64(CLEAR_AMOUNT)
+      .encrypt();
+
+    await mockUSDC.mint(signers.alice.address, CLEAR_AMOUNT);
+    await mockUSDC.connect(signers.alice).approve(bridgeAddress, CLEAR_AMOUNT);
+
+    await (
+      await bridge.connect(signers.alice).depositConfidential(input.handles[0], input.inputProof, 3)
+    ).wait();
+
+    const handle = await bridge.getDepositHandle(signers.alice.address);
+    const decryptResult = await fhevm.publicDecrypt([handle]);
+
+    const callbackTx = await bridge.onDecryptCallback(
+      [handle],
+      decryptResult.abiEncodedClearValues,
+      decryptResult.decryptionProof,
+    );
+
+    // BridgeExecuted should emit domain 3 (Arbitrum)
+    await expect(callbackTx)
+      .to.emit(bridge, "BridgeExecuted")
+      .withArgs(signers.alice.address, 3);
   });
 
   // ---------------------------------------------------------------------------
@@ -77,7 +135,7 @@ describe("ShadowBridgeETH", function () {
 
     const tx = await bridge
       .connect(signers.alice)
-      .depositConfidential(input.handles[0], input.inputProof);
+      .depositConfidential(input.handles[0], input.inputProof, 6);
 
     await expect(tx).to.emit(bridge, "DepositReceived").withArgs(signers.alice.address);
     expect(await bridge.hasPendingBridge(signers.alice.address)).to.be.true;
@@ -93,7 +151,7 @@ describe("ShadowBridgeETH", function () {
     await mockUSDC.connect(signers.alice).approve(bridgeAddress, CLEAR_AMOUNT);
 
     await (
-      await bridge.connect(signers.alice).depositConfidential(input.handles[0], input.inputProof)
+      await bridge.connect(signers.alice).depositConfidential(input.handles[0], input.inputProof, 6)
     ).wait();
 
     const handle = await bridge.getDepositHandle(signers.alice.address);
@@ -110,7 +168,7 @@ describe("ShadowBridgeETH", function () {
     await mockUSDC.connect(signers.alice).approve(bridgeAddress, CLEAR_AMOUNT * 2n);
 
     await (
-      await bridge.connect(signers.alice).depositConfidential(input.handles[0], input.inputProof)
+      await bridge.connect(signers.alice).depositConfidential(input.handles[0], input.inputProof, 6)
     ).wait();
 
     const input2 = await fhevm
@@ -119,7 +177,7 @@ describe("ShadowBridgeETH", function () {
       .encrypt();
 
     await expect(
-      bridge.connect(signers.alice).depositConfidential(input2.handles[0], input2.inputProof),
+      bridge.connect(signers.alice).depositConfidential(input2.handles[0], input2.inputProof, 6),
     ).to.be.revertedWith("ShadowBridgeETH: bridge already pending");
   });
 
@@ -138,7 +196,7 @@ describe("ShadowBridgeETH", function () {
     await mockUSDC.connect(signers.alice).approve(bridgeAddress, CLEAR_AMOUNT);
 
     await (
-      await bridge.connect(signers.alice).depositConfidential(input.handles[0], input.inputProof)
+      await bridge.connect(signers.alice).depositConfidential(input.handles[0], input.inputProof, 6)
     ).wait();
 
     // ---- 2. Simulate off-chain relayer: publicDecrypt ----
@@ -192,10 +250,10 @@ describe("ShadowBridgeETH", function () {
       .encrypt();
 
     await (
-      await bridge.connect(signers.alice).depositConfidential(inputAlice.handles[0], inputAlice.inputProof)
+      await bridge.connect(signers.alice).depositConfidential(inputAlice.handles[0], inputAlice.inputProof, 6)
     ).wait();
     await (
-      await bridge.connect(signers.bob).depositConfidential(inputBob.handles[0], inputBob.inputProof)
+      await bridge.connect(signers.bob).depositConfidential(inputBob.handles[0], inputBob.inputProof, 6)
     ).wait();
 
     expect(await bridge.hasPendingBridge(signers.alice.address)).to.be.true;
