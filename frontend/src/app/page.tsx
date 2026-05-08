@@ -2,8 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Header } from "@/components/Header";
-import { EthSepoliaPanel } from "@/components/EthSepoliaPanel";
-import { BaseSepoliaPanel } from "@/components/BaseSepoliaPanel";
+import { UnifiedBridgePanel } from "@/components/UnifiedBridgePanel";
 import { ExplorerPreview } from "@/components/ExplorerPreview";
 
 export default function Home() {
@@ -13,58 +12,72 @@ export default function Home() {
         minHeight: "100dvh",
         background: "var(--bg-base)",
         backgroundImage:
-          "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(139,92,246,0.04) 0%, transparent 100%)",
+          "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(139,92,246,0.06) 0%, transparent 100%)",
       }}
     >
       <Header />
 
       <main className="max-w-5xl mx-auto px-6 pt-10 pb-16">
-        {/* Hero subtitle */}
-        <motion.p
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.15 }}
-          style={{
-            textAlign: "center",
-            color: "var(--text-muted)",
-            fontSize: "0.8125rem",
-            marginBottom: "2.5rem",
-            letterSpacing: "0.01em",
-          }}
-        >
-          Amounts are encrypted before they touch the chain.
-          Nobody reads them until you decide.
-        </motion.p>
-
-        {/* Two panels — staggered entrance via the panels themselves */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <EthSepoliaPanel entranceDelay={0} />
-          <BaseSepoliaPanel entranceDelay={0.1} />
+        {/* Hero title/subtitle */}
+        <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+          <motion.h1
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            style={{
+              fontSize: "2.5rem",
+              fontWeight: 700,
+              letterSpacing: "-0.04em",
+              color: "var(--text-primary)",
+              marginBottom: "0.75rem",
+            }}
+          >
+            Confidential Cross-Chain
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.15 }}
+            style={{
+              color: "var(--text-muted)",
+              fontSize: "1rem",
+              letterSpacing: "0.01em",
+              maxWidth: "400px",
+              margin: "0 auto",
+            }}
+          >
+            Bridge USDC between Ethereum, Base, and Arbitrum with FHE encryption.
+            Amounts stay private until you reveal them.
+          </motion.p>
         </div>
 
-        {/* Bridge direction */}
+        {/* Unified Panel */}
+        <div style={{ marginBottom: "4rem" }}>
+          <UnifiedBridgePanel />
+        </div>
+
+        {/* Info Grid */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.35 }}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "0.75rem",
-            margin: "1.5rem 0",
-            userSelect: "none",
-          }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16"
         >
-          <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>
-            Ethereum Sepolia
-          </span>
-          <span style={{ color: "var(--border-default)", fontSize: "0.6875rem" }}>
-            ──── CCTP ────▶
-          </span>
-          <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>
-            Base Sepolia
-          </span>
+          <InfoCard
+            title="Encrypted Balances"
+            desc="USDC amounts are wrapped into euint64 handles. Plaintext numbers never touch the L2 state."
+            icon="🔒"
+          />
+          <InfoCard
+            title="Circle CCTP V2"
+            desc="Leveraging official mint/burn infrastructure for zero-slippage cross-chain liquidity."
+            icon="🌐"
+          />
+          <InfoCard
+            title="Zama FHEVM"
+            desc="Powered by Fully Homomorphic Encryption, allowing computation on ciphertexts."
+            icon="⚡"
+          />
         </motion.div>
 
         <ExplorerPreview />
@@ -72,19 +85,29 @@ export default function Home() {
         <motion.footer
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          style={{ textAlign: "center", marginTop: "3rem" }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+          style={{ textAlign: "center", marginTop: "4rem" }}
         >
-          <p style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>
-            Powered by{" "}
-            <span style={{ color: "var(--text-accent-base)" }}>Zama FHEVM</span>
-            {" · "}
-            <span style={{ color: "var(--text-accent-eth)" }}>Circle CCTP</span>
-            {" · "}
-            <span style={{ color: "var(--text-secondary)" }}>Base</span>
+          <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}>
+            <span>Built with</span>
+            <span style={{ color: "var(--accent-base)", fontWeight: 500 }}>Base</span>
+            <span style={{ color: "var(--border-default)" }}>·</span>
+            <span style={{ color: "var(--accent-arb)", fontWeight: 500 }}>Arbitrum</span>
+            <span style={{ color: "var(--border-default)" }}>·</span>
+            <span style={{ color: "var(--accent-eth)", fontWeight: 500 }}>Ethereum</span>
           </p>
         </motion.footer>
       </main>
+    </div>
+  );
+}
+
+function InfoCard({ title, desc, icon }: { title: string; desc: string; icon: string }) {
+  return (
+    <div style={{ padding: "1.5rem", borderRadius: "var(--radius-lg)", background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)" }}>
+      <div style={{ fontSize: "1.5rem", marginBottom: "1rem" }}>{icon}</div>
+      <h3 style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--text-primary)", marginBottom: "0.5rem" }}>{title}</h3>
+      <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)", lineHeight: 1.6 }}>{desc}</p>
     </div>
   );
 }

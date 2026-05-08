@@ -35,9 +35,10 @@ interface IShadowBridge {
     // -------------------------------------------------------------------------
 
     /// @notice Accepts an FHE-encrypted USDC amount and schedules a decrypt→bridge.
-    /// @param encryptedAmount  externalEuint64 handle produced by the FHEVM client SDK.
-    /// @param inputProof       ZK proof binding encryptedAmount to msg.sender + this contract.
-    function depositConfidential(externalEuint64 encryptedAmount, bytes calldata inputProof) external;
+    /// @param encryptedAmount   externalEuint64 handle produced by the FHEVM client SDK.
+    /// @param inputProof        ZK proof binding encryptedAmount to msg.sender + this contract.
+    /// @param destinationDomain Circle domain ID of the target chain (e.g. 6 = Base, 3 = Arbitrum).
+    function depositConfidential(externalEuint64 encryptedAmount, bytes calldata inputProof, uint32 destinationDomain) external;
 
     // -------------------------------------------------------------------------
     // Base-side interface
@@ -61,4 +62,16 @@ interface IShadowBridge {
 
     /// @notice Marks the caller's total balance as publicly decryptable.
     function decryptBalance() external;
+
+    /// @notice Burns an encrypted portion of stake via CCTP to a destination chain.
+    /// @param encryptedAmount    externalEuint64 handle for the amount to bridge out.
+    /// @param inputProof         ZK proof binding handle to msg.sender.
+    /// @param destinationDomain  Circle domain ID of target chain.
+    /// @param mintRecipient      bytes32-padded recipient address on the destination chain.
+    function bridgeOut(
+        externalEuint64 encryptedAmount,
+        bytes calldata inputProof,
+        uint32 destinationDomain,
+        bytes32 mintRecipient
+    ) external;
 }
