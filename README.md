@@ -50,12 +50,14 @@ See [`docs/architecture.md`](docs/architecture.md) for the full two-contract flo
 
 ## Deployed Contracts
 
-| Contract | Network | Address | Etherscan |
+| Contract | Network | Address | Explorer |
 |---|---|---|---|
-| ShadowBridgeBase | Sepolia | `0xC5Ab2eff958038aD58e541290781B5d9859d16c7` | [View ↗](https://sepolia.etherscan.io/address/0xC5Ab2eff958038aD58e541290781B5d9859d16c7#code) |
-| ShadowBridgeETH | Sepolia | `0x3BaeC7006BA6922c6B885D774B76557a66627B26` | [View ↗](https://sepolia.etherscan.io/address/0x3BaeC7006BA6922c6B885D774B76557a66627B26#code) |
-| Mock USDC (underlying) | Sepolia | `0x9b5Cd13b8eFbB58Dc25A05CF411D8056058aDFfF` | — |
-| Confidential cUSDC (ERC-7984) | Sepolia | `0x7c5BF43B851c1dff1a4feE8dB225b87f2C223639` | — |
+| ShadowBridgeBase | Sepolia | `0x8410EcE3bD4bA15CF868Cf53F766736334fa389D` | [Etherscan ↗](https://sepolia.etherscan.io/address/0x8410EcE3bD4bA15CF868Cf53F766736334fa389D#code) |
+| ShadowBridgeETH | Sepolia | `0x03DDBa3088E598aB95Bc03Cb58ae209F77D29d18` | [Etherscan ↗](https://sepolia.etherscan.io/address/0x03DDBa3088E598aB95Bc03Cb58ae209F77D29d18#code) |
+| ShadowBridgeArbitrum | Arbitrum Sepolia | `0xA0DcB7dD510e410bD1BABBD920E095551658B20c` | [Arbiscan ↗](https://sepolia.arbiscan.io/address/0xA0DcB7dD510e410bD1BABBD920E095551658B20c#code) |
+| Mock USDC (Sepolia) | Sepolia | `0x9b5Cd13b8eFbB58Dc25A05CF411D8056058aDFfF` | — |
+| Confidential cUSDC / ERC-7984 (Sepolia) | Sepolia | `0x7c5BF43B851c1dff1a4feE8dB225b87f2C223639` | — |
+| Mock USDC (Arbitrum Sepolia) | Arbitrum Sepolia | `0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d` | — |
 
 ---
 

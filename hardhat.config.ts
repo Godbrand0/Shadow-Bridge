@@ -17,7 +17,8 @@ dotenv.config();
 const PRIVATE_KEY: string = process.env.PRIVATE_KEY || "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
 const SEPOLIA_RPC_URL: string = process.env.SEPOLIA_RPC_URL || "";
 const BASE_SEPOLIA_RPC_URL: string = process.env.BASE_SEPOLIA_RPC_URL || "";
-const ETHERSCAN_API_KEY: string = process.env.ETHERSCAN_API_KEY || "";
+const ARB_SEPOLIA_RPC_URL: string  = process.env.ARB_SEPOLIA_RPC_URL  || "";
+const ETHERSCAN_API_KEY: string    = process.env.ETHERSCAN_API_KEY    || "";
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
@@ -64,25 +65,12 @@ const config: HardhatUserConfig = {
     baseSepolia: {
       accounts: [PRIVATE_KEY],
       chainId: 84532,
-      url: BASE_SEPOLIA_RPC_URL,
-    },
-    baseSepolia: {
-      accounts: {
-        mnemonic: MNEMONIC,
-        path: "m/44'/60'/0'/0/",
-        count: 10,
-      },
-      chainId: 84532,
-      url: "https://sepolia.base.org",
+      url: BASE_SEPOLIA_RPC_URL || "https://sepolia.base.org",
     },
     arbitrumSepolia: {
-      accounts: {
-        mnemonic: MNEMONIC,
-        path: "m/44'/60'/0'/0/",
-        count: 10,
-      },
+      accounts: [PRIVATE_KEY],
       chainId: 421614,
-      url: "https://sepolia-rollup.arbitrum.io/rpc",
+      url: ARB_SEPOLIA_RPC_URL || "https://sepolia-rollup.arbitrum.io/rpc",
     },
   },
   paths: {
