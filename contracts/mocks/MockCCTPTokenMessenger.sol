@@ -16,7 +16,7 @@ contract MockCCTPTokenMessenger is ICCTPTokenMessenger {
     address public usdc;
     uint256 private _nextMintAmount;
 
-    event BurnCalled(uint256 amount, uint32 destinationDomain, bytes32 mintRecipient, address burnToken);
+    event BurnCalled(uint256 amount, uint32 destinationDomain, bytes32 mintRecipient, address burnToken, uint256 maxFee, uint32 minFinalityThreshold);
 
     constructor(address _usdc) {
         usdc = _usdc;
@@ -31,10 +31,13 @@ contract MockCCTPTokenMessenger is ICCTPTokenMessenger {
         uint256 amount,
         uint32 destinationDomain,
         bytes32 mintRecipient,
-        address burnToken
+        address burnToken,
+        bytes32,
+        uint256 maxFee,
+        uint32 minFinalityThreshold
     ) external override returns (uint64 nonce) {
         IERC20(burnToken).transferFrom(msg.sender, address(this), amount);
-        emit BurnCalled(amount, destinationDomain, mintRecipient, burnToken);
+        emit BurnCalled(amount, destinationDomain, mintRecipient, burnToken, maxFee, minFinalityThreshold);
         return 1;
     }
 
