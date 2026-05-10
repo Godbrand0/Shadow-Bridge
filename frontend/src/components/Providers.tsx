@@ -6,13 +6,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RainbowKitProvider, darkTheme, getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { ThemeProvider } from "next-themes";
 import "@rainbow-me/rainbowkit/styles.css";
-import { ETH_CHAIN, BASE_CHAIN, TRANSPORTS } from "@/lib/chains";
+import { ETH_CHAIN, BASE_CHAIN, ARB_CHAIN, TRANSPORTS } from "@/lib/chains";
 
 const wagmiConfig = getDefaultConfig({
   appName: "ShadowBridge",
   projectId:
     process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "shadowbridge-demo",
-  chains: [ETH_CHAIN, BASE_CHAIN],
+  chains: [ETH_CHAIN, BASE_CHAIN, ARB_CHAIN],
   transports: TRANSPORTS,
   ssr: true,
 });
@@ -26,7 +26,7 @@ export function Providers({ children }: { children: ReactNode }) {
         <QueryClientProvider client={queryClient}>
           <RainbowKitProvider
             theme={darkTheme({
-              accentColor: "#8B5CF6",
+              accentColor: "#7C3AED",
               accentColorForeground: "white",
               borderRadius: "medium",
               fontStack: "system",

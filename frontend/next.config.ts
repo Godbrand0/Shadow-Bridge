@@ -1,6 +1,17 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+          { key: "Cross-Origin-Embedder-Policy", value: "credentialless" },
+        ],
+      },
+    ];
+  },
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -20,10 +31,11 @@ const nextConfig: NextConfig = {
         "pino-pretty": false,
       };
     }
-    // Suppress warnings from FHE SDK wasm modules
+    // Suppress warnings from FHE SDK wasm modules and its internal circular deps
     config.ignoreWarnings = [
       ...(config.ignoreWarnings ?? []),
       { module: /node_modules\/@zama-fhe/ },
+      { message: /Circular dependency between chunks with runtime/ },
     ];
     return config;
   },
