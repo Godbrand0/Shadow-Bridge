@@ -1,69 +1,93 @@
-/* ── ShadowBridge Design Tokens ──────────────────────────────────────────────
-   Dark theme (default). Light theme overrides via [data-theme="light"].
-   All values consumed via var(--token-name) throughout the codebase.
+/* ── ShadowBridge Design Tokens ───────────────────────────────────────────────
+   No gradients. Flat color surfaces, subtle depth via borders + shadows.
    ─────────────────────────────────────────────────────────────────────────── */
 
 :root {
-  /* Backgrounds */
-  --bg-base:     #0C0C10;
-  --bg-surface:  #13131A;
-  --bg-elevated: #1A1A24;
-  --bg-overlay:  #22222E;
+  /* ── Backgrounds ── */
+  --bg-base:     #08080C;
+  --bg-surface:  #0E0E13;
+  --bg-elevated: #15151B;
+  --bg-overlay:  #1C1C23;
 
-  /* Borders */
-  --border-subtle:  rgba(255, 255, 255, 0.06);
-  --border-default: rgba(255, 255, 255, 0.10);
-  --border-strong:  rgba(255, 255, 255, 0.18);
+  /* ── Borders ── */
+  --border-subtle:  #18181F;
+  --border-default: #22222B;
+  --border-strong:  #38383F;
+  --border-focus:   #6366F1;
 
-  /* Accents */
-  --accent-eth:        #F97316;
-  --accent-eth-muted:  rgba(249, 115, 22, 0.12);
-  --accent-base:       #8B5CF6;
-  --accent-base-muted: rgba(139, 92, 246, 0.12);
-  --accent-success:    #22C55E;
-  --accent-error:      #EF4444;
-  --accent-warning:    #F59E0B;
+  /* ── Primary accent (indigo) ── */
+  --accent-primary:       #6366F1;
+  --accent-primary-hover: #5254CC;
+  --accent-primary-muted: rgba(99, 102, 241, 0.10);
+  --accent-primary-ring:  rgba(99, 102, 241, 0.22);
 
-  /* Typography */
-  --text-primary:     #F4F4F5;
-  --text-secondary:   #A1A1AA;
-  --text-muted:       #52525B;
-  --text-accent-eth:  #F97316;
-  --text-accent-base: #8B5CF6;
+  /* ── Chain accents ── */
+  --accent-eth:   #627EEA;
+  --accent-base:  #0052FF;
+  --accent-arb:   #28A0F0;
 
-  /* Radius */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  /* ── Semantic status ── */
+  --accent-success:        #10B981;
+  --accent-success-muted:  rgba(16, 185, 129, 0.10);
+  --accent-error:          #EF4444;
+  --accent-error-muted:    rgba(239, 68, 68, 0.10);
+  --accent-warning:        #F59E0B;
+  --accent-warning-muted:  rgba(245, 158, 11, 0.10);
 
-  /* Shadows */
-  --shadow-sm:   0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-md:   0 4px 16px rgba(0, 0, 0, 0.4);
-  --shadow-eth:  0 0 24px rgba(249, 115, 22, 0.08);
-  --shadow-base: 0 0 24px rgba(139, 92, 246, 0.08);
+  /* ── Typography ── */
+  --text-primary:   #EDEDF2;
+  --text-secondary: #9292A4;
+  --text-muted:     #55555F;
+  --text-on-accent: #FFFFFF;
 
-  /* Transitions */
-  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* ── Radius ── */
+  --radius-xs:  3px;
+  --radius-sm:  5px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+  --radius-xl:  16px;
+  --radius-2xl: 22px;
+
+  /* ── Shadows ── */
+  --shadow-sm:    0 1px 3px rgba(0, 0, 0, 0.55);
+  --shadow-md:    0 4px 16px rgba(0, 0, 0, 0.45);
+  --shadow-lg:    0 16px 48px rgba(0, 0, 0, 0.55);
+  --shadow-focus: 0 0 0 3px var(--accent-primary-ring);
+
+  /* ── Transitions ── */
+  --transition-fast: 100ms ease;
+  --transition-base: 180ms ease;
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ── Light theme overrides ────────────────────────────────────────────────── */
+/* ── Keyframes ───────────────────────────────────────────────────────────── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.2; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── Light theme ─────────────────────────────────────────────────────────── */
 [data-theme="light"] {
-  --bg-base:     #FAFAFA;
+  --bg-base:     #F5F5FA;
   --bg-surface:  #FFFFFF;
-  --bg-elevated: #F4F4F5;
-  --bg-overlay:  #E4E4E7;
+  --bg-elevated: #F0F0F6;
+  --bg-overlay:  #E6E6EF;
 
-  --border-subtle:  rgba(0, 0, 0, 0.06);
-  --border-default: rgba(0, 0, 0, 0.10);
-  --border-strong:  rgba(0, 0, 0, 0.18);
+  --border-subtle:  #E8E8F0;
+  --border-default: #D5D5E2;
+  --border-strong:  #B8B8CB;
+  --border-focus:   #6366F1;
 
-  --text-primary:   #18181B;
-  --text-secondary: #71717A;
-  --text-muted:     #A1A1AA;
+  --text-primary:   #0C0C14;
+  --text-secondary: #4A4A5E;
+  --text-muted:     #9696AE;
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.10);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.10);
 }

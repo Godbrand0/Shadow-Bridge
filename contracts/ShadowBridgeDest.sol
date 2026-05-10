@@ -308,14 +308,16 @@ abstract contract ShadowBridgeDest is Ownable, IShadowBridge {
         hasPendingDecrypt[user] = false;
 
         if (cleartextAmount > 0) {
-            if (address(cUSDCToken) != address(0)) {
-                euint64 amountHandle = FHE.asEuint64(cleartextAmount);
-                FHE.allowThis(amountHandle);
-                FHE.allow(amountHandle, address(cUSDCToken));
-                cUSDCToken.confidentialTransfer(user, amountHandle);
-            } else {
-                IERC20(usdcToken).transfer(user, uint256(cleartextAmount));
-            }
+            // cUSDC must be configured — plaintext fallback would expose the
+            // unstaked amount on-chain and violate the privacy guarantee.
+            require(
+                address(cUSDCToken) != address(0),
+                "ShadowBridgeDest: cUSDC not configured; cannot complete unstake without plaintext leak"
+            );
+            euint64 amountHandle = FHE.asEuint64(cleartextAmount);
+            FHE.allowThis(amountHandle);
+            FHE.allow(amountHandle, address(cUSDCToken));
+            cUSDCToken.confidentialTransfer(user, amountHandle);
         }
 
         emit UnstakeCompleted(user);
