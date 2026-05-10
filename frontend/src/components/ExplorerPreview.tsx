@@ -13,42 +13,65 @@ type Row = {
 };
 
 const ROWS: Row[] = [
-  { hash: "0x3f2a…c901", chain: "ETH", chainColor: "var(--accent-eth)",  event: "depositConfidential()",      hasAmount: true  },
-  { hash: "0x7e1b…44d2", chain: "Base", chainColor: "var(--accent-base)", event: "stake()",                    hasAmount: true  },
-  { hash: "0x2d9f…b803", chain: "Base", chainColor: "var(--accent-base)", event: "decryptBalance()",            hasAmount: false },
-  { hash: "0x8c3a…2f71", chain: "Base", chainColor: "var(--accent-base)", event: "onBalanceDecryptCallback()",  hasAmount: true  },
+  { hash: "0x3f2a…c901", chain: "ETH",  chainColor: "var(--accent-eth)",  event: "depositConfidential()",     hasAmount: true  },
+  { hash: "0x7e1b…44d2", chain: "BASE", chainColor: "var(--accent-base)", event: "stake()",                   hasAmount: true  },
+  { hash: "0x2d9f…b803", chain: "BASE", chainColor: "var(--accent-base)", event: "decryptBalance()",           hasAmount: false },
+  { hash: "0x8c3a…2f71", chain: "BASE", chainColor: "var(--accent-base)", event: "onBalanceDecryptCallback()", hasAmount: true  },
 ];
 
 export function ExplorerPreview() {
   return (
     <motion.section
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.4 }}
+      transition={{ duration: 0.35, delay: 0.28 }}
     >
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem" }}>
-        <p style={{ fontSize: "0.6875rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-muted)", whiteSpace: "nowrap" }}>
+      {/* Section header */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "0.875rem",
+          marginBottom: "1rem",
+        }}
+      >
+        <span className="label-caps" style={{ whiteSpace: "nowrap" }}>
           What observers see on-chain
-        </p>
-        <div style={{ flex: 1, height: "1px", background: "var(--border-subtle)" }} />
+        </span>
+        <div
+          style={{
+            flex: 1,
+            height: "1px",
+            background: "var(--border-subtle)",
+          }}
+        />
       </div>
 
       {/* Table */}
-      <div style={{ borderRadius: "var(--radius-md)", overflow: "hidden", border: "1px solid var(--border-subtle)" }}>
+      <div
+        style={{
+          border: "1px solid var(--border-default)",
+          borderRadius: "var(--radius-xl)",
+          overflow: "hidden",
+        }}
+      >
         {/* Column headers */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 2.5fr 1fr",
+            gridTemplateColumns: "1.2fr 2.8fr 1fr",
             gap: "1rem",
-            padding: "0.5rem 1rem",
-            borderBottom: "1px solid var(--border-subtle)",
+            padding: "0.5625rem 1.125rem",
             background: "var(--bg-elevated)",
+            borderBottom: "1px solid var(--border-default)",
           }}
         >
           {["TX Hash", "Event", "Amount"].map((col) => (
-            <span key={col} style={{ fontSize: "0.625rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-muted)" }}>
+            <span
+              key={col}
+              className="label-caps"
+              style={{ letterSpacing: "0.07em" }}
+            >
               {col}
             </span>
           ))}
@@ -56,30 +79,50 @@ export function ExplorerPreview() {
 
         {/* Rows */}
         {ROWS.map((row, i) => (
-          <motion.div
+          <div
             key={i}
-            whileHover={{ background: "var(--bg-overlay)" }}
-            transition={{ duration: 0.15 }}
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr 2.5fr 1fr",
+              gridTemplateColumns: "1.2fr 2.8fr 1fr",
               gap: "1rem",
-              padding: "0.625rem 1rem",
+              padding: "0.6875rem 1.125rem",
               alignItems: "center",
-              background: i % 2 === 1 ? "var(--bg-elevated)" : "transparent",
+              background: "var(--bg-surface)",
               borderTop: i === 0 ? "none" : "1px solid var(--border-subtle)",
-              cursor: "default",
+              transition: "background var(--transition-fast)",
             }}
+            onMouseEnter={(e) =>
+              ((e.currentTarget as HTMLDivElement).style.background = "var(--bg-elevated)")
+            }
+            onMouseLeave={(e) =>
+              ((e.currentTarget as HTMLDivElement).style.background = "var(--bg-surface)")
+            }
           >
             {/* Hash */}
-            <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>
+            <span
+              className="mono"
+              style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}
+            >
               {row.hash}
             </span>
 
             {/* Event */}
-            <div style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
-              <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: row.chainColor, flexShrink: 0 }} />
-              <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--text-secondary)" }}>{row.event}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <div
+                style={{
+                  width: 5,
+                  height: 5,
+                  borderRadius: "1px",
+                  background: row.chainColor,
+                  flexShrink: 0,
+                }}
+              />
+              <span
+                className="mono"
+                style={{ fontSize: "0.6875rem", color: "var(--text-secondary)" }}
+              >
+                {row.event}
+              </span>
             </div>
 
             {/* Amount */}
@@ -87,21 +130,33 @@ export function ExplorerPreview() {
               <span
                 className="mono"
                 title="Encrypted — not visible to observers"
-                style={{ fontSize: "0.75rem", color: "var(--bg-overlay)", letterSpacing: "-0.5px", userSelect: "none" }}
+                style={{
+                  fontSize: "0.6875rem",
+                  color: "var(--border-strong)",
+                  letterSpacing: "-1px",
+                  userSelect: "none",
+                }}
               >
                 {ENCRYPTED_BLOCK}
               </span>
             ) : (
               <span style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>—</span>
             )}
-          </motion.div>
+          </div>
         ))}
       </div>
 
       {/* Caption */}
-      <p style={{ fontSize: "0.6875rem", color: "var(--text-muted)", textAlign: "center", marginTop: "0.75rem", fontStyle: "italic", lineHeight: 1.6 }}>
-        All amounts and identities remain encrypted.
-        Only event signatures are public.
+      <p
+        style={{
+          fontSize: "0.6875rem",
+          color: "var(--text-muted)",
+          textAlign: "center",
+          marginTop: "0.75rem",
+          lineHeight: 1.65,
+        }}
+      >
+        All amounts remain encrypted on-chain. Only event signatures are public.
       </p>
     </motion.section>
   );

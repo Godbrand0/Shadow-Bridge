@@ -3,11 +3,29 @@
 import { FHEVM_CONFIG } from "./contracts";
 
 export type EncryptedInput = {
-  handle: `0x${string}`;    // bytes32 ciphertext handle
-  inputProof: `0x${string}`; // ZK proof bytes
+  handle: `0x${string}`;
+  inputProof: `0x${string}`;
 };
 
 let instanceCache: unknown | null = null;
+
+const ZERO_ADDR = "0x0000000000000000000000000000000000000000";
+
+function validateConfig() {
+  const required: Record<string, string> = {
+    relayerUrl:                                FHEVM_CONFIG.relayerUrl,
+    aclAddress:                                FHEVM_CONFIG.aclAddress,
+    kmsVerifierAddress:                        FHEVM_CONFIG.kmsVerifierAddress,
+    inputVerifierAddress:                      FHEVM_CONFIG.inputVerifierAddress,
+    verifyingContractAddressDecryption:        FHEVM_CONFIG.verifyingContractAddressDecryption,
+    verifyingContractAddressInputVerification: FHEVM_CONFIG.verifyingContractAddressInputVerification,
+  };
+  for (const [key, val] of Object.entries(required)) {
+    if (!val || val === "0x" || val === ZERO_ADDR) {
+      throw new Error(`FHEVM config missing or zero: ${key}`);
+    }
+  }
+}
 
 /**
  * Lazily creates (and caches) an FhevmInstance for Sepolia.
@@ -19,30 +37,40 @@ export async function getFhevmInstance(): Promise<unknown | null> {
   if (instanceCache) return instanceCache;
 
   try {
-    // Dynamic import: the relayer-sdk uses browser APIs (WebAssembly, fetch)
-    // Use the /web subpath export which provides a browser-compatible bundle.
-    const sdk = await import("@zama-fhe/relayer-sdk/web");
-    const createFn =
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (sdk as any).createFhevmInstance ?? (sdk as any).default?.createFhevmInstance;
+    validateConfig();
 
-    if (!createFn) throw new Error("createFhevmInstance not found in SDK");
-
-    instanceCache = await createFn({
-      networkUrl: process.env.NEXT_PUBLIC_ETH_SEPOLIA_RPC,
+    console.log("FHEVM config being used:", {
       relayerUrl: FHEVM_CONFIG.relayerUrl,
-      chainId: 11155111,
-      gatewayChainId: 11155111,
-      aclContractAddress: FHEVM_CONFIG.aclAddress,
-      kmsContractAddress: FHEVM_CONFIG.kmsVerifierAddress,
-      inputVerifierContractAddress: FHEVM_CONFIG.inputVerifierAddress,
-      verifyingContractAddressDecryption: FHEVM_CONFIG.kmsVerifierAddress,
-      verifyingContractAddressInputVerification: FHEVM_CONFIG.inputVerifierAddress,
+      gatewayChainId: FHEVM_CONFIG.gatewayChainId,
+      aclAddress: FHEVM_CONFIG.aclAddress,
     });
 
+    const sdk = await import("@zama-fhe/relayer-sdk/web");
+
+    // Cover the export name change across SDK versions (init vs initSDK)
+    const initFn = (sdk as any).init ?? (sdk as any).initSDK ?? (sdk as any).default?.init;
+    if (!initFn) throw new Error("No init function found in relayer-sdk/web — check SDK version");
+    await initFn();
+
+    const createFn = (sdk as any).createInstance ?? (sdk as any).default?.createInstance;
+    if (!createFn) throw new Error("createInstance not found in relayer-sdk/web");
+
+    instanceCache = await createFn({
+      network:                                   process.env.NEXT_PUBLIC_ETH_SEPOLIA_RPC || "https://eth-sepolia.public.blastapi.io",
+      relayerUrl:                                FHEVM_CONFIG.relayerUrl,
+      chainId:                                   11155111,
+      gatewayChainId:                            FHEVM_CONFIG.gatewayChainId,
+      aclContractAddress:                        FHEVM_CONFIG.aclAddress,
+      kmsContractAddress:                        FHEVM_CONFIG.kmsVerifierAddress,
+      inputVerifierContractAddress:              FHEVM_CONFIG.inputVerifierAddress,
+      verifyingContractAddressDecryption:        FHEVM_CONFIG.verifyingContractAddressDecryption,
+      verifyingContractAddressInputVerification: FHEVM_CONFIG.verifyingContractAddressInputVerification,
+    });
+
+    console.log("FHEVM SDK initialized successfully");
     return instanceCache;
   } catch (err) {
-    console.warn("FHEVM SDK init failed (relayer may be unavailable):", err);
+    console.warn("FHEVM SDK init failed:", err);
     return null;
   }
 }
@@ -90,6 +118,15 @@ export async function encryptUsdcAmount(
     console.error("Encryption failed:", err);
     throw new Error("FHE encryption failed — is the relayer reachable?");
   }
+}
+
+/**
+ * Returns true if the FHEVM relayer is unreachable and the demo placeholder
+ * will be used. Safe to call at component mount time.
+ */
+export async function isDemoMode(): Promise<boolean> {
+  const instance = await getFhevmInstance();
+  return instance === null;
 }
 
 /** Formats a USDC micro-amount (uint64) to a human-readable string. */
