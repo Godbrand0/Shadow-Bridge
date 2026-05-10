@@ -40,7 +40,7 @@ const STATUS_LABEL: Record<RelayStatus, string> = {
   pending:   "Pending",
   attesting: "Attesting",
   relaying:  "Relaying",
-  completed: "Completed",
+  completed: "Settled",
   failed:    "Failed",
 };
 
@@ -55,7 +55,7 @@ const STATUS_COLOR: Record<RelayStatus, string> = {
 const STATUS_BG: Record<RelayStatus, string> = {
   pending:   "var(--accent-warning-muted)",
   attesting: "var(--accent-warning-muted)",
-  relaying:  "rgba(40, 160, 240, 0.10)",
+  relaying:  "rgba(40, 160, 240, 0.08)",
   completed: "var(--accent-success-muted)",
   failed:    "var(--accent-error-muted)",
 };
@@ -71,24 +71,24 @@ function StatusBadge({ status }: { status: RelayStatus }) {
       style={{
         display: "inline-flex",
         alignItems: "center",
-        gap: "0.3125rem",
-        fontSize: "0.625rem",
-        fontWeight: 600,
+        gap: "0.375rem",
+        fontSize: "0.5625rem",
+        fontWeight: 800,
         color: STATUS_COLOR[status],
         background: STATUS_BG[status],
-        border: `1px solid ${STATUS_COLOR[status]}30`,
-        borderRadius: "var(--radius-2xl)",
-        padding: "0.1875rem 0.5625rem",
+        border: `1px solid ${STATUS_COLOR[status]}25`,
+        borderRadius: "var(--radius-xs)",
+        padding: "0.25rem 0.5rem",
         textTransform: "uppercase",
-        letterSpacing: "0.07em",
+        letterSpacing: "0.1em",
         flexShrink: 0,
       }}
     >
       {isLive && (
         <span
           style={{
-            width: 4,
-            height: 4,
+            width: 3,
+            height: 3,
             borderRadius: "50%",
             background: STATUS_COLOR[status],
             animation: "pulse 1.4s ease-in-out infinite",
@@ -106,30 +106,28 @@ function StatusBadge({ status }: { status: RelayStatus }) {
 function ChainChip({ chainId }: { chainId: number }) {
   const meta = CHAIN_META[chainId];
   if (!meta) return (
-    <span style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>Chain {chainId}</span>
+    <span style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>CH {chainId}</span>
   );
   return (
     <span
       style={{
         display: "inline-flex",
         alignItems: "center",
-        gap: "0.3125rem",
+        gap: "0.5rem",
         fontSize: "0.75rem",
-        fontWeight: 600,
-        color: meta.color,
-        letterSpacing: "0.01em",
+        fontWeight: 700,
+        color: "var(--text-primary)",
       }}
     >
-      <span
+      <div
         style={{
           width: 5,
           height: 5,
-          borderRadius: "1px",
           background: meta.color,
           flexShrink: 0,
         }}
       />
-      {meta.short}
+      <span className="mono">{meta.short}</span>
     </span>
   );
 }
@@ -149,18 +147,27 @@ function TxLink({ hash, chainId, label }: { hash: string; chainId: number; label
         fontSize: "0.6875rem",
         color: "var(--text-muted)",
         textDecoration: "none",
-        transition: "color var(--transition-fast)",
+        transition: "all var(--transition-fast)",
         display: "inline-flex",
         alignItems: "center",
         gap: "0.25rem",
+        padding: "0.125rem 0.375rem",
+        background: "var(--bg-elevated)",
+        borderRadius: "var(--radius-xs)",
       }}
-      onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "var(--text-secondary)")}
-      onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "var(--text-muted)")}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLAnchorElement).style.color = "var(--text-primary)";
+        (e.currentTarget as HTMLAnchorElement).style.background = "var(--border-subtle)";
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLAnchorElement).style.color = "var(--text-muted)";
+        (e.currentTarget as HTMLAnchorElement).style.background = "var(--bg-elevated)";
+      }}
     >
-      <span style={{ color: "var(--text-muted)", marginRight: "0.1875rem" }}>{label}:</span>
+      <span style={{ color: "var(--text-muted)", fontWeight: 800 }}>{label.toUpperCase()}:</span>
       {hash.slice(0, 6)}…{hash.slice(-4)}
-      <svg width="9" height="9" viewBox="0 0 12 12" fill="none" aria-hidden>
-        <path d="M2 10L10 2M10 2H5M10 2v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+        <path d="M7 17L17 7M17 7H7M17 7v10" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     </a>
   );
@@ -178,10 +185,10 @@ function RelativeTime({ ts }: { ts: number }) {
       const m = Math.floor(s / 60);
       const h = Math.floor(m / 60);
       const d = Math.floor(h / 24);
-      if (d > 0) setLabel(`${d}d ago`);
-      else if (h > 0) setLabel(`${h}h ago`);
-      else if (m > 0) setLabel(`${m}m ago`);
-      else setLabel(`${s}s ago`);
+      if (d > 0) setLabel(`${d}D`);
+      else if (h > 0) setLabel(`${h}H`);
+      else if (m > 0) setLabel(`${m}M`);
+      else setLabel(`${s}S`);
     }
     update();
     const id = setInterval(update, 30_000);
@@ -189,7 +196,7 @@ function RelativeTime({ ts }: { ts: number }) {
   }, [ts]);
 
   return (
-    <span style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>{label}</span>
+    <span className="mono" style={{ fontSize: "0.625rem", color: "var(--text-muted)", fontWeight: 700 }}>{label}</span>
   );
 }
 
@@ -198,18 +205,15 @@ function RelativeTime({ ts }: { ts: number }) {
 function RefreshIcon({ spinning }: { spinning: boolean }) {
   return (
     <svg
-      width="13"
-      height="13"
+      width="14"
+      height="14"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
-      aria-hidden
-      style={{ animation: spinning ? "spin 0.8s linear infinite" : "none" }}
+      strokeWidth="2.5"
+      style={{ animation: spinning ? "spin 1s linear infinite" : "none" }}
     >
-      <polyline points="23 4 23 10 17 10" />
-      <polyline points="1 20 1 14 7 14" />
-      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+      <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
     </svg>
   );
 }
@@ -223,33 +227,21 @@ function TxRow({ tx }: { tx: BridgeTx }) {
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.18 }}
       style={{
-        padding: "0.875rem 1.125rem",
+        padding: "1.25rem 1.5rem",
         borderBottom: "1px solid var(--border-subtle)",
         display: "flex",
         flexDirection: "column",
-        gap: "0.5rem",
+        gap: "0.75rem",
       }}
     >
       {/* Top row */}
-      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
         <ChainChip chainId={srcChainId} />
-        <svg
-          width="10"
-          height="10"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="var(--text-muted)"
-          strokeWidth="2"
-          style={{ flexShrink: 0, opacity: 0.5 }}
-          aria-hidden
-        >
-          <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <ArrowRightIcon />
         <ChainChip chainId={destChainId} />
         <div style={{ flex: 1 }} />
         <StatusBadge status={tx.status} />
@@ -257,25 +249,29 @@ function TxRow({ tx }: { tx: BridgeTx }) {
       </div>
 
       {/* Hash links */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.1875rem" }}>
-        <TxLink hash={tx.burnTxHash} chainId={srcChainId} label="Burn" />
+      <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+        <TxLink hash={tx.burnTxHash} chainId={srcChainId} label="Source" />
         {tx.relayTxHash && (
           <TxLink hash={tx.relayTxHash} chainId={destChainId} label="Relay" />
         )}
-        {tx.status === "failed" && tx.error && (
-          <span
-            style={{
-              fontSize: "0.6875rem",
-              color: "var(--accent-error)",
-              lineHeight: 1.5,
-              marginTop: "0.125rem",
-            }}
-          >
-            {tx.error.slice(0, 80)}
-          </span>
-        )}
       </div>
+
+      {tx.status === "failed" && tx.error && (
+        <div style={{ padding: "0.5rem", background: "var(--accent-error-muted)", borderRadius: "var(--radius-xs)", border: "1px solid rgba(255, 77, 77, 0.1)" }}>
+          <span style={{ fontSize: "0.6875rem", color: "var(--accent-error)", fontWeight: 500 }}>
+            {tx.error.slice(0, 100)}
+          </span>
+        </div>
+      )}
     </motion.div>
+  );
+}
+
+function ArrowRightIcon() {
+  return (
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="3">
+      <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   );
 }
 
@@ -283,54 +279,17 @@ function TxRow({ tx }: { tx: BridgeTx }) {
 
 function EmptyState({ connected }: { connected: boolean }) {
   return (
-    <div
-      style={{
-        padding: "3rem 2rem",
-        textAlign: "center",
-        color: "var(--text-muted)",
-      }}
-    >
-      <div
-        style={{
-          width: 40,
-          height: 40,
-          borderRadius: "var(--radius-lg)",
-          background: "var(--bg-elevated)",
-          border: "1px solid var(--border-default)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          margin: "0 auto 1.25rem",
-        }}
-      >
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          style={{ opacity: 0.45 }}
-          aria-hidden
-        >
-          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinecap="round" strokeLinejoin="round" />
+    <div style={{ padding: "4rem 2rem", textAlign: "center" }}>
+      <div style={{ width: 48, height: 48, background: "var(--bg-elevated)", border: "1px solid var(--border-default)", display: "flex", alignItems: "center", justifyCenter: "center", margin: "0 auto 1.5rem", borderRadius: "var(--radius-md)" }}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2" style={{ margin: "auto" }}>
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
         </svg>
       </div>
-      <p
-        style={{
-          fontSize: "0.875rem",
-          fontWeight: 600,
-          color: "var(--text-secondary)",
-          marginBottom: "0.375rem",
-          letterSpacing: "-0.01em",
-        }}
-      >
-        {connected ? "No transactions yet" : "Connect wallet to see history"}
+      <p className="label-caps" style={{ color: "var(--text-secondary)", marginBottom: "0.5rem" }}>
+        {connected ? "No Data Records" : "Auth Required"}
       </p>
-      <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)", lineHeight: 1.6 }}>
-        {connected
-          ? "Your bridge activity will appear here."
-          : "Connect your wallet to view past bridge transactions."}
+      <p style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+        {connected ? "Your encrypted history is empty." : "Connect wallet to sync history."}
       </p>
     </div>
   );
@@ -364,72 +323,43 @@ export function TransactionHistory() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 14 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.28 }}
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
       style={{
         background: "var(--bg-surface)",
         border: "1px solid var(--border-default)",
-        borderRadius: "var(--radius-2xl)",
-        maxWidth: "460px",
+        borderRadius: "var(--radius-xl)",
+        maxWidth: "480px",
         margin: "0 auto",
         overflow: "hidden",
-        boxShadow: "var(--shadow-md)",
+        boxShadow: "var(--shadow-lg)",
       }}
     >
       {/* Header */}
       <div
         style={{
-          padding: "1rem 1.25rem",
+          padding: "1.25rem 1.5rem",
           borderBottom: "1px solid var(--border-default)",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          gap: "1rem",
+          background: "var(--bg-elevated)",
         }}
       >
-        <div>
-          <p className="label-caps" style={{ marginBottom: "0.2rem" }}>Transaction History</p>
-          <p
-            style={{
-              fontSize: "0.8125rem",
-              color: "var(--text-secondary)",
-              letterSpacing: "-0.01em",
-            }}
-          >
-            {txs.length > 0
-              ? `${txs.length} transaction${txs.length === 1 ? "" : "s"}`
-              : "All bridges"}
-          </p>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <div style={{ width: 8, height: 8, background: "var(--accent-primary)" }} />
+          <span className="label-caps" style={{ color: "var(--text-primary)" }}>Protocol Ledger</span>
         </div>
 
         <button
           onClick={() => void load()}
           disabled={loading}
-          title="Refresh"
-          aria-label="Refresh transaction history"
           style={{
-            background: "var(--bg-elevated)",
-            border: "1px solid var(--border-default)",
-            borderRadius: "var(--radius-md)",
-            padding: "0.4375rem",
+            background: "none",
+            border: "none",
             cursor: loading ? "not-allowed" : "pointer",
             color: "var(--text-muted)",
             display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            transition: "all var(--transition-fast)",
-            flexShrink: 0,
-          }}
-          onMouseEnter={(e) => {
-            if (!loading) {
-              (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border-strong)";
-              (e.currentTarget as HTMLButtonElement).style.color = "var(--text-secondary)";
-            }
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border-default)";
-            (e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)";
           }}
         >
           <RefreshIcon spinning={loading} />
@@ -437,18 +367,11 @@ export function TransactionHistory() {
       </div>
 
       {/* Content */}
-      <div style={{ maxHeight: "420px", overflowY: "auto" }}>
+      <div style={{ maxHeight: "500px", overflowY: "auto" }}>
         {!address ? (
           <EmptyState connected={false} />
         ) : loading && txs.length === 0 ? (
-          <div
-            style={{
-              padding: "3rem 2rem",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+          <div style={{ padding: "4rem", display: "flex", justifyContent: "center" }}>
             <RefreshIcon spinning />
           </div>
         ) : txs.length === 0 ? (
@@ -464,16 +387,9 @@ export function TransactionHistory() {
 
       {/* Footer */}
       {txs.length > 0 && lastFetch > 0 && (
-        <div
-          style={{
-            padding: "0.5625rem 1.25rem",
-            borderTop: "1px solid var(--border-subtle)",
-            display: "flex",
-            justifyContent: "flex-end",
-          }}
-        >
-          <span style={{ fontSize: "0.625rem", color: "var(--text-muted)" }}>
-            Updated <RelativeTime ts={lastFetch} />
+        <div style={{ padding: "0.75rem 1.5rem", borderTop: "1px solid var(--border-subtle)", textAlign: "right" }}>
+          <span className="mono" style={{ fontSize: "0.625rem", color: "var(--text-muted)" }}>
+            LAST_SYNC: <RelativeTime ts={lastFetch} />
           </span>
         </div>
       )}

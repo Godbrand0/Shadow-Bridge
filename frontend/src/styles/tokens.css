@@ -1,25 +1,28 @@
-/* ── ShadowBridge Design Tokens ───────────────────────────────────────────────
-   No gradients. Flat color surfaces, subtle depth via borders + shadows.
+/* ── ShadowBridge Design Tokens (Superbridge Aesthetic) ────────────────────────
+   Inspired by Superbridge: Deep purples, high contrast, very rounded corners.
    ─────────────────────────────────────────────────────────────────────────── */
 
 :root {
   /* ── Backgrounds ── */
-  --bg-base:     #08080C;
-  --bg-surface:  #0E0E13;
-  --bg-elevated: #15151B;
-  --bg-overlay:  #1C1C23;
+  --bg-base:     #050508;
+  --bg-surface:  #111116;
+  --bg-elevated: #1A1A22;
+  --bg-overlay:  #22222C;
+  
+  /* Superbridge Purple Glow */
+  --bg-gradient: radial-gradient(circle at bottom, #3D007A 0%, #050508 70%);
 
   /* ── Borders ── */
-  --border-subtle:  #18181F;
-  --border-default: #22222B;
-  --border-strong:  #38383F;
-  --border-focus:   #6366F1;
+  --border-subtle:  #1A1A22;
+  --border-default: #262630;
+  --border-strong:  #3F3F4D;
+  --border-focus:   #9F7AEA;
 
-  /* ── Primary accent (indigo) ── */
-  --accent-primary:       #6366F1;
-  --accent-primary-hover: #5254CC;
-  --accent-primary-muted: rgba(99, 102, 241, 0.10);
-  --accent-primary-ring:  rgba(99, 102, 241, 0.22);
+  /* ── Primary accent (Purple) ── */
+  --accent-primary:       #9F7AEA;
+  --accent-primary-hover: #B794F4;
+  --accent-primary-muted: rgba(159, 122, 234, 0.12);
+  --accent-primary-ring:  rgba(159, 122, 234, 0.25);
 
   /* ── Chain accents ── */
   --accent-eth:   #627EEA;
@@ -27,67 +30,52 @@
   --accent-arb:   #28A0F0;
 
   /* ── Semantic status ── */
-  --accent-success:        #10B981;
-  --accent-success-muted:  rgba(16, 185, 129, 0.10);
-  --accent-error:          #EF4444;
-  --accent-error-muted:    rgba(239, 68, 68, 0.10);
-  --accent-warning:        #F59E0B;
-  --accent-warning-muted:  rgba(245, 158, 11, 0.10);
+  --accent-success:        #38A169;
+  --accent-success-muted:  rgba(56, 161, 105, 0.12);
+  --accent-error:          #E53E3E;
+  --accent-error-muted:    rgba(229, 62, 62, 0.12);
+  --accent-warning:        #DD6B20;
+  --accent-warning-muted:  rgba(221, 107, 32, 0.12);
 
   /* ── Typography ── */
-  --text-primary:   #EDEDF2;
-  --text-secondary: #9292A4;
-  --text-muted:     #55555F;
-  --text-on-accent: #FFFFFF;
+  --text-primary:   #FFFFFF;
+  --text-secondary: #A0A0B0;
+  --text-muted:     #718096;
+  --text-on-accent: #000000;
 
-  /* ── Radius ── */
-  --radius-xs:  3px;
-  --radius-sm:  5px;
-  --radius-md:  8px;
-  --radius-lg:  12px;
-  --radius-xl:  16px;
-  --radius-2xl: 22px;
+  /* ── Radius (Large for Superbridge feel) ── */
+  --radius-xs:  4px;
+  --radius-sm:  8px;
+  --radius-md:  12px;
+  --radius-lg:  16px;
+  --radius-xl:  24px;
+  --radius-2xl: 32px;
 
   /* ── Shadows ── */
-  --shadow-sm:    0 1px 3px rgba(0, 0, 0, 0.55);
-  --shadow-md:    0 4px 16px rgba(0, 0, 0, 0.45);
-  --shadow-lg:    0 16px 48px rgba(0, 0, 0, 0.55);
-  --shadow-focus: 0 0 0 3px var(--accent-primary-ring);
+  --shadow-sm:    0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md:    0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-lg:    0 24px 64px rgba(0, 0, 0, 0.7);
+  --shadow-focus: 0 0 0 4px var(--accent-primary-ring);
 
   /* ── Transitions ── */
-  --transition-fast: 100ms ease;
-  --transition-base: 180ms ease;
-  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 120ms ease;
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ── Keyframes ───────────────────────────────────────────────────────────── */
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.2; }
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
-/* ── Light theme ─────────────────────────────────────────────────────────── */
 [data-theme="light"] {
-  --bg-base:     #F5F5FA;
+  --bg-base:     #F7FAFC;
   --bg-surface:  #FFFFFF;
-  --bg-elevated: #F0F0F6;
-  --bg-overlay:  #E6E6EF;
+  --bg-elevated: #EDF2F7;
+  --bg-overlay:  #E2E8F0;
+  --bg-gradient: none;
 
-  --border-subtle:  #E8E8F0;
-  --border-default: #D5D5E2;
-  --border-strong:  #B8B8CB;
-  --border-focus:   #6366F1;
+  --border-subtle:  #EDF2F7;
+  --border-default: #E2E8F0;
+  --border-strong:  #CBD5E0;
+  --border-focus:   #9F7AEA;
 
-  --text-primary:   #0C0C14;
-  --text-secondary: #4A4A5E;
-  --text-muted:     #9696AE;
-
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.07);
-  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.10);
+  --text-primary:   #1A202C;
+  --text-secondary: #4A5568;
+  --text-muted:     #718096;
 }
